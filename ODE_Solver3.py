@@ -17,47 +17,53 @@ globalvar = rho = np.float128(raw_input('Input Stellar Density (kilograms per cu
 rho = rho * (spc.G/(spc.c**2)) * 1.0e6
 
 def main():
-    RungeKutta4(f1, f2, 1.0e-12, 100.0, 0.0, 2.041e-22, 1000)
+    RungeKutta4(f1, f2, 1.0e-163, 1.0, 0.0, 2.041e-22, 10)
 
 def RungeKutta4(f, g, x0, x1, y0, z0, n):
-    h = (x1-x0)
-    x = x0
-    y = y0   
-    z = z0    
+    h = x1  # Step Size
+    x = x0  # Initial Radius
+    y = y0  # Initial Mass 
+    z = z0  # Central Pressure  
     data_x = []
     data_y = []
     data_z = []
     data=[]
     i = 0
     for i in range(0, n + 1):
-        k1 = h * f(x,y)
-        j1 = h * g(x,z)
-
-        k2 = h * f(x + h/2.0, y + k1/2.0)
-        j2 = h * g(x + h/2.0, z + j1/2.0)
-
-        k3 = h * f(x + h/2.0, y + k2/2.0)
-        j3 = h * g(x + h/2.0, z + j2/2.0)
-
-        k4 = h * f(x + h, y + k3)
-        j4 = h * g(x + h, z + j3)
-        
-        k = (1.0/6.0) * (k1 + 2.0*k2 + 2.0*k3 + k4)
-        j = (1.0/6.0) * (j1 + 2.0*j2 + 2.0*j3 + j4)   
-        if (z + j) > 0.0:                    # Determination if step size needs
-            x = x + h                        # to change for next iteration
-            y = y + k                        
-            z = z + j
-        elif (z + j) < 0.0:
-            h = (-1.0) * (z / j) * h
-            x = x
+        if x < 1.0e-25:
+            x = x + h
             y = y
             z = z
-        if z < 1.0e-25:
-            x = x + h
-            y = y + k
-            z = z + j
-            break
+        else:    
+            k1 = h * f(x,y)
+            j1 = h * g(x,z)
+
+            k2 = h * f(x + h/2.0, y + k1/2.0)
+            j2 = h * g(x + h/2.0, z + j1/2.0)
+
+            k3 = h * f(x + h/2.0, y + k2/2.0)
+            j3 = h * g(x + h/2.0, z + j2/2.0)
+
+            k4 = h * f(x + h, y + k3)
+            j4 = h * g(x + h, z + j3)
+        
+            k = (1.0/6.0) * (k1 + 2.0*k2 + 2.0*k3 + k4)
+            j = (1.0/6.0) * (j1 + 2.0*j2 + 2.0*j3 + j4)   
+            print x, y, z
+            if (z + j) > 0.0:                    # Determination if step size needs
+                x = x + h                        # to change for next iteration
+                y = y + k                        
+                z = z + j
+            elif (z + j) < 0.0:
+                h = (-1.0) * (z / j) * h
+                x = x
+                y = y
+                z = z
+            if z < 1.0e-25:
+                x = x + h
+                y = y + k
+                z = z + j
+                break
         data.append([x,y,z])
         data_x.append(x)
         data_y.append(y)
