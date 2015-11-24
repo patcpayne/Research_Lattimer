@@ -17,7 +17,7 @@ globalvar = rho = np.float128(raw_input('Input Stellar Density (kilograms per cu
 rho = rho * (spc.G/(spc.c**2)) * 1.0e6
 
 def main():
-    RungeKutta4(f1, f2, 1.0e-163, 1.0, 0.0, 2.041e-22, 10)
+    RungeKutta4(f1, f2, 1.0e-163, 1000.0, 0.0, 2.041e-22, 1000)
 
 def RungeKutta4(f, g, x0, x1, y0, z0, n):
     h = x1  # Step Size
@@ -49,20 +49,20 @@ def RungeKutta4(f, g, x0, x1, y0, z0, n):
         
             k = (1.0/6.0) * (k1 + 2.0*k2 + 2.0*k3 + k4)
             j = (1.0/6.0) * (j1 + 2.0*j2 + 2.0*j3 + j4)   
-            print x, y, z
-            if (z + j) > 0.0:                    # Determination if step size needs
+           #5print x, y, z
+            if (z + ((1.0/6.0) * (j1 + 2.0*j2 + 2.0*j3 + j4))) > 0.0:                    # Determination if step size needs
                 x = x + h                        # to change for next iteration
-                y = y + k                        
-                z = z + j
-            elif (z + j) < 0.0:
-                h = (-1.0) * (z / j) * h
+                y = y + (1.0/6.0) * (k1 + 2.0*k2 + 2.0*k3 + k4)                        
+                z = z + (1.0/6.0) * (j1 + 2.0*j2 + 2.0*j3 + j4) 
+            elif (z + ((1.0/6.0) * (j1 + 2.0*j2 + 2.0*j3 + j4))) < 0.0:
+                h = (-1.0) * (z / ((1.0/6.0) * (j1 + 2.0*j2 + 2.0*j3 + j4)) ) * h
                 x = x
                 y = y
                 z = z
             if z < 1.0e-25:
                 x = x + h
-                y = y + k
-                z = z + j
+                y = y + (1.0/6.0) * (k1 + 2.0*k2 + 2.0*k3 + k4)
+                z = z + (1.0/6.0) * (j1 + 2.0*j2 + 2.0*j3 + j4) 
                 break
         data.append([x,y,z])
         data_x.append(x)
