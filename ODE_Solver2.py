@@ -17,28 +17,32 @@ import matplotlib.pylab as plt
 #rho = rho * (spc.G/(spc.c**2)) * 1.0e6
 
 def main():
-    RungeKutta4(f1, f2, 0.0, 1000, 0.0, 2.041e-22, 1.36, 10000)
-    RK4(1.36, 10000)
+    RungeKutta4(f1, f2, 0.0, 1000, 0.0, 2.041e-22, 5.0, 1000000)
+    #RK4(0.5, 10000)
 
 """-------------------------------------------------------------------------"""
 
-def RungeKutta4(f, g, x0, x1, y0, z0, gamma, n):
+def RungeKutta4(f, g, x0, x1, y0, z0, n, s):
     h = x1  # Step Size
     x = x0  # Initial Radius
     y = y0  # Initial Mass 
-    z = z0  # Central Pressure 
-    rho = z0 ** (1.0/gamma)
+    z = z0  # Central Pressure
+    rho0 = z0 ** (n/(n+1.0))
+    rho = z0 ** (n/(n+1.0))
     data_x = []
     data_y = []
     data_z = []
     data=[]
+    rho_avg = []    
     i = 0
-    for i in range(0, n + 1):
+    for i in range(0, s + 1):
         if x < 1.0e-25:
             x = x + 1.0e-10
             y = y
             z = z
-        else:    
+            print z
+        else: 
+            rho = z ** (n/(n+1))
             k1 = h * f(x,y, rho)
             k2 = h * f(x + h/2.0, y + k1/2.0, rho)
             k3 = h * f(x + h/2.0, y + k2/2.0, rho)            
@@ -50,12 +54,16 @@ def RungeKutta4(f, g, x0, x1, y0, z0, gamma, n):
             j3 = h * g(x + h/2.0, z + j2/2.0, rho)
             j4 = h * g(x + h, z + j3, rho)
             j = (1.0/6.0) * (j1 + 2.0*j2 + 2.0*j3 + j4)   
-            print rho, x, y, z+j
+            #print rho, x, y, z+j   
+            if (i % 10) == 0:
+                print j
+#                print rho
+#                print rho0
             if (z + j) > 0.0:                    # Determination if step size needs
                 x = x + h                        # to change for next iteration
                 y = y + k                        
                 z = z + j
-                rho = z ** (1.0/gamma)
+                print h
             elif (z + j) < 0.0:
                 h = (-1.0) * (z / j) * h
                 x = x
@@ -70,6 +78,7 @@ def RungeKutta4(f, g, x0, x1, y0, z0, gamma, n):
         data_x.append(x)
         data_y.append(y)
         data_z.append(z)
+        rho_avg.append(rho)
       
 # The units for Mass and Pressure are geometric units obtained by
  #      multiplying MASS by G/(c**2) and PRESSURE by G/(c**4) and then 
@@ -77,21 +86,25 @@ def RungeKutta4(f, g, x0, x1, y0, z0, gamma, n):
    #    multiplying by 1000000 for PRESSURE
     #   Gravitational constant and Speed of light drop out of equations as they
      #  equal 1 in the geometrized unit system 
-       
     plt.plot(data_x,data_y)                  # Plots Radius v Mass 
     plt.xlabel('Radius ($km$)', fontsize=14)                     
     plt.ylabel('Mass ($km$) ', fontsize=14)
     plt.show()
+    plt.ylim([0.0, 3.0e-22])  
     plt.plot(data_x,data_z)                  # Plots Radius v Pressure
     plt.xlabel('Radius ($km$)', fontsize=14)                     
     plt.ylabel('Pressure ($km^{-2}$) ', fontsize=14)    
     plt.show()
+    plt.ylim([0.0, 3.0e-22])  
     plt.plot(data_y,data_z)                  # Plots data (Mass v Pressure)
     plt.xlabel('Mass ($km$)', fontsize=14)                     
     plt.ylabel('Pressure ($km^{-2}$) ', fontsize=14)
     plt.show() 
     x = x * 1.0
     y = y * 1.0
+    rho_avg = (np.average(rho_avg))
+    ratio = rho0/rho_avg
+    print "Central Pressure to Average Presure ratio: %g" %ratio
     print "Radius (km)= %g" %x
     print "Mass (km)= %.4E" %d.Decimal(str(y)) #Converts to Scientific Notation
     
@@ -100,19 +113,18 @@ def f1(r, m, rho):
     dM_dr = 4.0 * pi * (r**2) * rho# Function for dM/dr
     return   dM_dr
   
-def f2(r, P, rho):            # Function for dP/dr, substituted m with Integral(dm/dr) 
-    m =  (4.0/3.0) * pi * r**3 * rho      
-    dP_dr = (-1.0) * ( m * rho) / r**2
+def f2(r, P, rho):            # Function for dP/dr, substituted m with Integral(dm/dr)     
+    dP_dr = (-1.0) * (4.0/3.0) * rho * np.pi * r
     return  dP_dr   
     
 '''-------------------------------------------------------------------------'''
 
-def Initials(gamma):
+def Initials(n):
     r = 0.0
     dr = 1000.0
     M0 = 0.0
     P0 = 2.041e-22
-    Rho0 = P0**(1.0/gamma)
+    Rho0 = P0**(n/(n+1.0))
     y0 = np.array([M0, P0])
     return (r, dr, y0, Rho0)
     
@@ -124,14 +136,14 @@ def Eqns(r,y0,Rho):
     rhs = np.array([rhs1, rhs2])    
     return  M, P, rhs 
     
-def RK4(gamma, n):
-    r, dr, y0 , rho = Initials(gamma)
+def RK4(n, s):
+    r, dr, y0 , rho = Initials(n)
     data_r = []
     data_M = []
     data_P = []
     y = y0
 
-    for i in range(0, n + 1):
+    for i in range(0, s + 1):
         
         if r < 1.0e-25:
             r = r + 1.0e-20
@@ -155,7 +167,7 @@ def RK4(gamma, n):
         if (P + j) > 0.0:
             y = y + k
             r = r + dr
-            rho = y[1]**(1.0/gamma)
+            rho = y[1]**(n/(n+1.0))
             data_r.append(r)
             data_M.append(M)
             data_P.append(P)
