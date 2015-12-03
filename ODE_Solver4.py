@@ -17,8 +17,8 @@ import matplotlib.pylab as plt
 #rho = rho * (spc.G/(spc.c**2)) * 1.0e6
 
 def main():
-    RungeKutta4(f1, f2, 0.0, 1000, 0.0, 2.041e-22, 1.333, 10000)
-    RK4(1.333, 10000)
+    RungeKutta4(f1, f2, 0.0, 1000, 0.0, 2.041e-22, 3.0, 10000)
+    #RK4(1.333, 10000)
 
 """-------------------------------------------------------------------------"""
 
@@ -33,8 +33,8 @@ def RungeKutta4(f, g, x0, x1, y0, z0, gamma, n):
     data_z = []
     data=[]
     data_density = []
-    i = 0
-    for i in range(0, n + 1):
+    j = 0.0
+    while(z > 1.0e-24) or (z + j <= 0.0):
         if x < 1.0e-25:
             x = x + 1.0e-10
             y = y
@@ -51,7 +51,6 @@ def RungeKutta4(f, g, x0, x1, y0, z0, gamma, n):
             j3 = h * g(x + h/2.0, z + j2/2.0, rho)
             j4 = h * g(x + h, z + j3, rho)
             j = (1.0/6.0) * (j1 + 2.0*j2 + 2.0*j3 + j4)   
-            #print rho, x, y, z+j
             if (z + j) > 0.0:                    # Determination if step size needs
                 x = x + h                        # to change for next iteration
                 y = y + k                        
@@ -62,11 +61,6 @@ def RungeKutta4(f, g, x0, x1, y0, z0, gamma, n):
                 x = x
                 y = y
                 z = z
-            if z < 1.0e-24:
-                x = x + h
-                y = y + k
-                z = z + j
-                break
         data.append([x,y,z,])
         data_x.append(x)
         data_y.append(y)
@@ -136,8 +130,8 @@ def RK4(gamma, n):
     data_P = []
     data_density = []
     y = y0
-
-    for i in range(0, n + 1):
+    j = 0.0
+    while(y[1] > 1.0e-24)or (y[1] + j <= 0.0):
         
         if r < 1.0e-25:
             r = r + 1.0e-20
@@ -167,15 +161,9 @@ def RK4(gamma, n):
             data_P.append(P)
             data_density.append(rho)
         elif (P + j) < 0.0:
+            print ('test')
             dr = (P / j) * dr * (-1.0)
-            y = y
-        if P < 1.0e-24:
-            r = r + dr
-            y = y + k 
-            data_r.append(r)
-            data_M.append(M)
-            data_P.append(P)
-            break   
+            y = y 
     plt.plot(data_r,data_M)                  # Plots Radius v Mass 
     plt.xlabel('Radius ($km$)', fontsize=14)                     
     plt.ylabel('Mass ($km$) ', fontsize=14)

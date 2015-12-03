@@ -17,7 +17,7 @@ import matplotlib.pylab as plt
 #rho = rho * (spc.G/(spc.c**2)) * 1.0e6
 
 def main():
-    RungeKutta4(f1, f2, 0.0, 1000, 0.0, 2.041e-22, 1.333, 10000)
+    RungeKutta4(f1, f2, 0.0, 100.0, 0.0, 2.041e-22, 1.333, 10000)
     RK4(1.333, 10000)
 
 """-------------------------------------------------------------------------"""
@@ -51,7 +51,6 @@ def RungeKutta4(f, g, x0, x1, y0, z0, gamma, n):
             j3 = h * g(x + h/2.0, z + j2/2.0, rho)
             j4 = h * g(x + h, z + j3, rho)
             j = (1.0/6.0) * (j1 + 2.0*j2 + 2.0*j3 + j4)   
-            #print rho, x, y, z+j
             if (z + j) > 0.0:                    # Determination if step size needs
                 x = x + h                        # to change for next iteration
                 y = y + k                        
