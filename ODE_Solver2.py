@@ -17,8 +17,36 @@ import matplotlib.pylab as plt
 #rho = rho * (spc.G/(spc.c**2)) * 1.0e6
 
 def main():
-    RungeKutta4(f1, f2, 0.0, 100.0, 0.0, 2.041e-22, 1.333, 10000)
-    RK4(1.333, 10000)
+    RungeKutta4(f1, f2, 0.0, 1000000.0, 0.0, 2.041e-22, 1.0, 1000000)
+    RungeKutta4(f1, f2, 0.0, 1000.0, 0.0, 2.041e-22, 3.0, 10000)
+    RungeKutta4(f1, f2, 0.0, 1000.0, 0.0, 2.041e-22, 2.0, 10000)
+    RungeKutta4(f1, f2, 0.0, 1000.0, 0.0, 2.041e-22, 5.0/3.0, 10000)
+    RungeKutta4(f1, f2, 0.0, 1000.0, 0.0, 2.041e-22, 1.5, 10000)
+    RungeKutta4(f1, f2, 0.0, 1000.0, 0.0, 2.041e-22, 1.4, 10000)
+    RungeKutta4(f1, f2, 0.0, 1000.0, 0.0, 2.041e-22, 4.0/3.0, 10000)
+    RungeKutta4(f1, f2, 0.0, 1000.0, 0.0, 2.041e-22, 4.25/3.25, 10000)
+    RungeKutta4(f1, f2, 0.0, 1000.0, 0.0, 2.041e-22, 4.5/3.5, 10000)
+    RungeKutta4(f1, f2, 0.0, 1000.0, 0.0, 2.041e-22, 5.0/4.0, 100000)
+    RungeKutta4(f1, f2, 0.0, 1000.0, 0.0, 2.041e-22, 5.5/4.5, 100000)
+    RungeKutta4(f1, f2, 0.0, 1000.0, 0.0, 2.041e-22, 5.9/4.9, 100000)
+    RungeKutta4(f1, f2, 0.0, 1000.0, 0.0, 2.041e-22, 6.0/5.0, 100000)
+    
+    print "----------------------------------------------"    
+    
+    #RK4(1.333, 10000)
+    RK4(1.0, 10000)
+    RK4(3.0, 10000)
+    RK4(2.0, 10000)
+    RK4(5.0/3.0, 10000)
+    RK4(1.5, 10000)
+    RK4(1.4, 10000)
+    RK4(4.0/3.0, 10000)
+    RK4(4.25/3.25, 10000)
+    RK4(4.5/3.5, 10000)
+    RK4(5.0/4.0, 100000)
+    RK4(5.5/4.5, 100000)
+    RK4(5.9/4.9, 100000)
+    RK4(6.0/5.0, 100000)
 
 """-------------------------------------------------------------------------"""
 
@@ -28,6 +56,7 @@ def RungeKutta4(f, g, x0, x1, y0, z0, gamma, n):
     y = y0  # Initial Mass 
     z = z0  # Central Pressure 
     rho = z0 ** (1.0/gamma)
+    print 'Central Pressure: %g' %rho
     data_x = []
     data_y = []
     data_z = []
@@ -50,7 +79,9 @@ def RungeKutta4(f, g, x0, x1, y0, z0, gamma, n):
             j2 = h * g(x + h/2.0, z + j1/2.0, rho)
             j3 = h * g(x + h/2.0, z + j2/2.0, rho)
             j4 = h * g(x + h, z + j3, rho)
-            j = (1.0/6.0) * (j1 + 2.0*j2 + 2.0*j3 + j4)   
+            j = (1.0/6.0) * (j1 + 2.0*j2 + 2.0*j3 + j4)  
+#            if (i%500 == 0):
+#                print x, y, z, k, j
             if (z + j) > 0.0:                    # Determination if step size needs
                 x = x + h                        # to change for next iteration
                 y = y + k                        
@@ -79,27 +110,28 @@ def RungeKutta4(f, g, x0, x1, y0, z0, gamma, n):
     #   Gravitational constant and Speed of light drop out of equations as they
      #  equal 1 in the geometrized unit system 
        
-    plt.plot(data_x,data_y)                  # Plots Radius v Mass 
-    plt.xlabel('Radius ($km$)', fontsize=14)                     
-    plt.ylabel('Mass ($km$) ', fontsize=14)
-    plt.show()
-    plt.plot(data_x,data_z)                  # Plots Radius v Pressure
-    plt.xlabel('Radius ($km$)', fontsize=14)                     
-    plt.ylabel('Pressure ($km^{-2}$) ', fontsize=14)    
-    plt.show()
-    plt.plot(data_y,data_z)                  # Plots data (Mass v Pressure)
-    plt.xlabel('Mass ($km$)', fontsize=14)                     
-    plt.ylabel('Pressure ($km^{-2}$) ', fontsize=14)
-    plt.show() 
-    x = x * 1.0
-    y = y * 1.0
+#    plt.plot(data_x,data_y)                  # Plots Radius v Mass 
+#    plt.xlabel('Radius ($km$)', fontsize=14)                     
+#    plt.ylabel('Mass ($km$) ', fontsize=14)
+#    plt.show()
+#    plt.plot(data_x,data_z)                  # Plots Radius v Pressure
+#    plt.xlabel('Radius ($km$)', fontsize=14)                     
+#    plt.ylabel('Pressure ($km^{-2}$) ', fontsize=14)    
+#    plt.show()
+#    plt.plot(data_y,data_z)                  # Plots data (Mass v Pressure)
+#    plt.xlabel('Mass ($km$)', fontsize=14)                     
+#    plt.ylabel('Pressure ($km^{-2}$) ', fontsize=14)
+#    plt.show() 
+#    x = x * 1.0
+#    y = y * 1.0
     rho_c =  z0 ** (1.0/gamma)
     rho_avg = np.average(data_density)
     ratio = rho_c/rho_avg
+    print "Gamma: %g" %gamma
     print "Ratio of Central Pressure to Average Pressure: %g" %ratio
     print "Radius (km)= %g" %x
     print "Mass (km)= %.4E" %d.Decimal(str(y)) #Converts to Scientific Notation
-    
+    print '\n'
 
 def f1(r, m, rho): 
     dM_dr = 4.0 * pi * (r**2) * rho# Function for dM/dr
@@ -135,6 +167,7 @@ def RK4(gamma, n):
     data_P = []
     data_density = []
     y = y0
+    print "Central Pressure: %g" %rho
 
     for i in range(0, n + 1):
         
@@ -175,25 +208,27 @@ def RK4(gamma, n):
             data_M.append(M)
             data_P.append(P)
             break   
-    plt.plot(data_r,data_M)                  # Plots Radius v Mass 
-    plt.xlabel('Radius ($km$)', fontsize=14)                     
-    plt.ylabel('Mass ($km$) ', fontsize=14)
-    plt.show()
-    plt.plot(data_r,data_P)                  # Plots Radius v Pressure
-    plt.xlabel('Radius ($km$)', fontsize=14)                     
-    plt.ylabel('Pressure ($km^{-2}$) ', fontsize=14)    
-    plt.show()
-    plt.plot(data_M,data_P)                  # Plots data (Mass v Pressure)
-    plt.xlabel('Mass ($km$)', fontsize=14)                     
-    plt.ylabel('Pressure ($km^{-2}$) ', fontsize=14)
-    plt.show() 
+#    plt.plot(data_r,data_M)                  # Plots Radius v Mass 
+#    plt.xlabel('Radius ($km$)', fontsize=14)                     
+#    plt.ylabel('Mass ($km$) ', fontsize=14)
+#    plt.show()
+#    plt.plot(data_r,data_P)                  # Plots Radius v Pressure
+#    plt.xlabel('Radius ($km$)', fontsize=14)                     
+#    plt.ylabel('Pressure ($km^{-2}$) ', fontsize=14)    
+#    plt.show()
+#    plt.plot(data_M,data_P)                  # Plots data (Mass v Pressure)
+#    plt.xlabel('Mass ($km$)', fontsize=14)                     
+#    plt.ylabel('Pressure ($km^{-2}$) ', fontsize=14)
+#    plt.show() 
     rho_c =  y0[1] ** (1.0/gamma)
     rho_avg = np.average(data_density)
     ratio = rho_c/rho_avg
+    print "Gamma: %g" %gamma
     print "Ratio of Central Pressure to Average Pressure: %g" %ratio
     print "Radius (km)= %g" %r
     print "Mass (km)= %.4E" %d.Decimal(str(M)) #Converts to Scientific Notation
-            
+    print '\n'
+        
 """-------------------------------------------------------------------------"""            
 
 if __name__ == '__main__':
